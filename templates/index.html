@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <title>Step1 Flask</title>
+</head>
+<body>
+  <form id="ul_form">
+    <input type="file" name="img_file" accept="image/*">
+    <button id="upload_btn" type="button">upload</button>
+  </form>
+  {% if img_url %}
+  <p>
+    <img id="uld_img" src="{{img_url}}">
+  </p>
+
+  <!--投稿された「画像のパス」を取得し、hiddenでformに送信する-->
+  <form id="recognition_form">
+    <input type="hidden" name="img_path">
+    <button id="recognition_btn" type="button">画像認識</button>
+  </form>
+  {% endif %}
+  {% if pred_label %}
+  <h1>{{pred_label}}</h1>
+  {% endif %}
+  <script>
+    $(function(){
+      $("#upload_btn").on("click", function(){
+        $("#ul_form").attr("target", "_self");
+        $("#ul_form").attr("method", "post");
+        $("#ul_form").attr("action", "{{url_for('upload')}}");
+        $("#ul_form").attr("enctype", "multipart/form-data");
+        $("#ul_form").submit();
+      })
+
+      $("#recognition_btn").on("click", function(){
+        /* value属性に何を送信するのか追加している。この場合はuld_img要素のパスをvalueとしてサーバーに送信するように設定してる。 */
+        $("input[name='img_path']").val($("#uld_img").attr("src"));　
+        $("#recognition_form").attr("target", "_self");
+        $("#recognition_form").attr("method", "post");
+        $("#recognition_form").attr("action", "{{url_for('recognition')}}");
+        $("#recognition_form").submit();
+      })
+    });
+  </script>
+</body>
+</html>
