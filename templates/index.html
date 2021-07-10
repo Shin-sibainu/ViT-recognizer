@@ -1,28 +1,81 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
   <title>Step1 Flask</title>
+  <link rel="icon" href="{{url_for('static', filename='img/favicon.ico')}}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <style>
+    .header{
+      margin-bottom: 12px;
+    }
+    nav {
+      height: 65px;
+    }
+    .ibox{
+      border: 2px dotted rgb(22, 98, 101);
+      width: 320px;
+      height: 320px;
+      vertical-align: bottom;
+      border-radius: 5%;
+      margin-bottom: 12px;
+    }
+    h1{
+      color: grey;
+    }
+    img{
+      width: 300px;
+      height: 300px;
+    }
+  </style>
 </head>
 <body>
+<div class="header">
+  <nav class="navbar navbar-dark bg-dark">
+    <p id="logo">
+      <img style="height:50px;width:50px;margin-right:12px;" src="{{url_for('static', filename='img/logo.png')}}">
+      <font color="white">ViT Recognizer</font>
+    </p>
+  </nav>
+</div>
+<div class="container">
   <form id="ul_form">
-    <input type="file" name="img_file" accept="image/*">
-    <button id="upload_btn" type="button">upload</button>
+    <label>
+    <div class="btn btn-primary" style="margin-left: 12px;">
+      ファイル選択
+      <input type="file" name="img_file" accept="image/*" style="display: none;">
+    </div>
+  </label>
+    <button class="btn btn-primary" id="upload_btn" type="button">アップロード</button>
+    {% if img_url %}
+    <button class="btn btn-primary" id="recognition_btn" type="button">画像認識</button>
+    {% endif %}
   </form>
-  {% if img_url %}
-  <p>
-    <img id="uld_img" src="{{img_url}}">
-  </p>
+    <div class="row">
+      <div class="col-12 ibox" id="img_box">
+        {% if img_url %}
+        <p>
+          <img id="uld_img" src="{{img_url}}">
+        </p> 
+        <!--投稿された「画像のパス」を取得し、hiddenでformに送信する-->
+        <form id="recognition_form">
+          <input type="hidden" name="img_path">
+        </form>
+        {% else %}
+          <h1>画像をアップロードしてください。</h1>
+        {% endif %}
+      </div>
+      <div class="col-12 ibox" id="res_box">
+        {% if pred_label %}
+        <h1>{{pred_label}}</h1>
+        {% else %}
+        <h1>画像認識結果が表示されます。</h1>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 
-  <!--投稿された「画像のパス」を取得し、hiddenでformに送信する-->
-  <form id="recognition_form">
-    <input type="hidden" name="img_path">
-    <button id="recognition_btn" type="button">画像認識</button>
-  </form>
-  {% endif %}
-  {% if pred_label %}
-  <h1>{{pred_label}}</h1>
-  {% endif %}
+</body>
   <script>
     $(function(){
       $("#upload_btn").on("click", function(){
@@ -41,7 +94,10 @@
         $("#recognition_form").attr("action", "{{url_for('recognition')}}");
         $("#recognition_form").submit();
       })
+
+      $("#logo").on("click", function(){
+        window.location = "{{url_for('index')}}"
+      })
     });
   </script>
-</body>
 </html>
