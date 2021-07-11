@@ -24,8 +24,8 @@
       color: grey;
     }
     img{
-      width: 300px;
-      height: 300px;
+      width: 280px;
+      height: 280px;
     }
   </style>
 </head>
@@ -54,13 +54,12 @@
     <div class="row">
       <div class="col-12 ibox" id="img_box">
         {% if img_url %}
-        <p>
-          <img id="uld_img" src="{{img_url}}">
-        </p> 
+        <img id="uld_img" src="{{img_url}}">
         <!--投稿された「画像のパス」を取得し、hiddenでformに送信する-->
         <form id="recognition_form">
           <input type="hidden" name="img_path">
         </form>
+        <p>アップロードされた画像</p>
         {% else %}
           <h1>画像をアップロードしてください。</h1>
         {% endif %}
@@ -78,6 +77,27 @@
 </body>
   <script>
     $(function(){
+      $("input[type=file]").after('<span>/<span>');
+      $("input[type=file]").change(function(){
+        var file = $(this).prop("files")[0];
+
+        //画像以外選択できないようにする.
+        if(! file.type.match("image.*")){
+          $(this).val('')
+          return;
+        }
+
+        //画像だった場合
+        var reader = new FileReader();
+        reader.onload = function(){
+          var img_src = $("<img id='img_bef'>").attr("src", reader.result);
+          $("#img_box").html(img_src);
+          $("<p>アップロード前画像(選択中)</p>").insertAfter("#img_bef")
+        }
+        reader.readAsDataURL(file)
+      })
+
+
       $("#upload_btn").on("click", function(){
         $("#ul_form").attr("target", "_self");
         $("#ul_form").attr("method", "post");
@@ -92,6 +112,7 @@
         $("#recognition_form").attr("target", "_self");
         $("#recognition_form").attr("method", "post");
         $("#recognition_form").attr("action", "{{url_for('recognition')}}");
+        $("#res_box").html("<h1>画像認識中...</h1>");
         $("#recognition_form").submit();
       })
 
